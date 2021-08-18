@@ -1,350 +1,157 @@
-$(window).on("load", function () {
-  $(".loader-wrapper").fadeOut(500, function () {});
-  $(".items").isotope({
-    filter: ".ios",
-    animationOptions: {
-      duration: 400,
-      easing: "linear",
-      queue: false,
-    },
-  });
-});
+(function ($) {
+    'use strict';
 
-var aboutSectionEntered = false;
 
-$(document).ready(function () {
-  var countUpFinished = false;
-  var $window = $(window);
-  var $portfolio_title = $("#portfolio-title");
-  var $stats_title = $("#stats-title");
-  var $tech_title = $("#technical-title");
-  var $skill_caro = $(".left-double");
-  var $portfolio_items = $(".squareItem");
-  var $contact_section = $("#contact-me");
-  var $contact_desc = $("#contact-desc");
-  var $skills_show = $(".skill-showcase");
-  var $filters = $(".filter");
-  var $portfolio_container = $("#items-left-double");
 
-  $("#slides").superslides({
-    animation: "fade",
-    play: 0,
-    pagination: false,
-  });
-
-  new Typed(".typed", {
-    strings: ["iOS Developer"],
-    typeSpeed: 60,
-    loop: false,
-    startDelay: 800,
-    showCursor: false,
-    onComplete: function () {
-      console.log("finished babt");
-      new Typed(".alternate-job", {
-        strings: ["Freelancer"],
-        typeSpeed: 60,
-        loop: false,
-        startDelay: 0,
-        showCursor: false,
-        onComplete: function () {
-          new Typed(".location-text", {
-            strings: ["Bengaluru, India"],
-            typeSpeed: 60,
-            loop: false,
-            startDelay: 0,
-            showCursor: false,
-          });
-          $(".location-box > i").addClass("show");
-        },
-      });
-    },
-  });
-
-  $(".owl-carousel").owlCarousel({
-    loop: true,
-    items: 4,
-    responsive: {
-      0: {
-        items: 1,
-      },
-      480: {
-        items: 2,
-      },
-      768: {
-        items: 3,
-      },
-      938: {
-        items: 4,
-      },
-    },
-  });
-
-  $('[data-toggle="tooltip"]').tooltip();
-
-  $("[data-fancybox]").fancybox();
-
-  $("#filters a").click(function () {
-    $("#filters .current").removeClass("current");
-    $(".items").removeClass("large");
-    $(this).addClass("current");
-
-    if (this.innerHTML == "IOS") {
-      console.log("found");
-      $(".items").addClass("large");
-    }
-
-    console.log("clicked filter", this);
-    var selector = $(this).attr("data-filter");
-
-    $(".items").isotope({
-      filter: selector,
-      animationOptions: {
-        duration: 400,
-        easing: "linear",
-        queue: true,
-      },
+    // Sticky Menu
+    $(window).scroll(function () {
+        if ($('.navigation').offset().top > 100) {
+            $('.navigation').addClass('nav-bg');
+        } else {
+            $('.navigation').removeClass('nav-bg');
+        }
     });
 
-    return false;
-  });
-
-  $("#navigation .brand a").click(function (e) {
-    e.preventDefault();
-    $("html,body").animate({ scrollTop: 0 }, "slow");
-  });
-
-  $("#navigation li a").click(function (e) {
-    e.preventDefault();
-    var targetElement = $(this).attr("href");
-    console.log(e.currentTarget.innerHTML.toLowerCase());
-    if (e.currentTarget.innerHTML.toLowerCase() === "skills") {
-      var targetPosition = $(targetElement).offset().top + 80;
-    } else {
-      var targetPosition = $(targetElement).offset().top;
-    }
-    $("html,body").animate({ scrollTop: targetPosition - 50 }, "slow");
-  });
-
-  const nav = $("#navigation");
-  const navTop = nav.offset().top;
-
-  $(window).on("scroll", stickNavigation);
-  $(window).on("scroll", enterSection);
-  $(window).on("scroll", function () {
-    // console.log($(window))
-    if (isScrolledIntoView($stats_title, $window)) {
-      $stats_title.addClass("in-right");
-    }
-  });
-  $(window).on("scroll", function () {
-    if (isScrolledIntoView($portfolio_title, $window)) {
-      $portfolio_title.addClass("in-left");
-    }
-  });
-  $(window).on("scroll", function () {
-    if (isScrolledIntoView($tech_title, $window)) {
-      $tech_title.addClass("in-left");
-    }
-  });
-
-  $(window).on("scroll", function () {
-    if (isScrolledIntoView($skill_caro, $window)) {
-      $skill_caro.addClass("in-left-double");
-    }
-  });
-  $(window).on("scroll", function () {
-    if (isScrolledIntoView($portfolio_items, $window) && !countUpFinished) {
-      $portfolio_items.addClass("in-right-double");
-      $(".counter").each(function () {
-        var element = $(this);
-        var endVal = parseInt(element.text());
-
-        element.countup(endVal);
-      });
-
-      countUpFinished = true;
-    }
-  });
-  $(window).on("scroll", function () {
-    if (isScrolledIntoView($contact_section, $window)) {
-      $contact_section.addClass("in-up");
-    }
-  });
-  $(window).on("scroll", function () {
-    if (isScrolledIntoView($contact_desc, $window)) {
-      $contact_desc.addClass("in-up");
-    }
-  });
-
-  $(window).on("scroll", function () {
-    if (isScrolledIntoView($filters, $window)) {
-      $filters.addClass("in-left");
-    }
-    if (isScrolledIntoView($filters, $window, 200)) {
-      $portfolio_container.addClass("in-left");
-    }
-  });
-
-  function stickNavigation() {
-    var body = $("body");
-
-    if ($(window).scrollTop() >= navTop) {
-      body.css("padding-top", nav.outerHeight() + "px");
-      body.addClass("fixedNav");
-    } else {
-      body.css("padding-top", 0);
-      body.removeClass("fixedNav");
-    }
-  }
-
-  var current = navTop;
-  const aboutTop = $("#about").offset().top;
-  const skillsTop = $("#skills").offset().top;
-  const statsTop = $("#stats").offset().top;
-  const portfolioTop = $("#portfolio").offset().top;
-  const contactTop = $("#contact").offset().top;
-
-  function enterSection() {
-    if ($(window).scrollTop() < navTop) {
-      $(".active").removeClass("active");
-      $(".brand").addClass("active");
-    } else if ($(window).scrollTop() <= aboutTop) {
-      $(".active").removeClass("active");
-      $(".item0").addClass("active");
-      showAboutIntroductionTexts();
-    } else if (
-      $(window).scrollTop() > aboutTop + 600 &&
-      $(window).scrollTop() < skillsTop
-    ) {
-      $(".active").removeClass("active");
-      $(".item1").addClass("active");
-    } else if (
-      $(window).scrollTop() > skillsTop + 500 &&
-      $(window).scrollTop() < statsTop
-    ) {
-      $(".active").removeClass("active");
-      $(".item2").addClass("active");
-    } else if (
-      $(window).scrollTop() > statsTop + 300 &&
-      $(window).scrollTop() < portfolioTop
-    ) {
-      $(".active").removeClass("active");
-      $(".item3").addClass("active");
-    } else if (
-      $(window).scrollTop() > portfolioTop + 800 &&
-      $(window).scrollTop() < contactTop
-    ) {
-      $(".active").removeClass("active");
-      $(".item4").addClass("active");
-    }
-  }
-
-  function isScrolledIntoView($elem, $window, $value = 0) {
-    var docViewTop = $window.scrollTop();
-    var docViewBottom = docViewTop + $window.height();
-    var elemTop = $elem.offset().top;
-    var elemBottom = elemTop + $elem.height();
-    return (
-      elemBottom + $value <= docViewBottom - 50 &&
-      elemTop + $value >= docViewTop + 50
-    );
-  }
-});
-
-function showAboutIntroductionTexts() {
-  if (!aboutSectionEntered) {
-    new Typed("#work", {
-      strings: [
-        "Currently working @ <span class = 'color-primary'>Dailyrounds/Marrow, ex-Spacebasic Inc., ex-Infosys</span>",
-      ],
-      typeSpeed: 20,
-      loop: false,
-      startDelay: 0,
-      showCursor: false,
-      onComplete: function () {
-        new Typed(".office-text", {
-          strings: [
-            "Devoting office hours into developing the Marrow app.",
-          ],
-          typeSpeed: 30,
-          loop: false,
-          startDelay: 0,
-          showCursor: false,
-          onComplete: function () {
-            new Typed(".spare-text", {
-              strings: [
-                "In my spare time, I <span class = 'color-primary'>develop</span> iOS apps and <span class = 'color-primary'>explore</span> tech.",
-              ],
-              typeSpeed: 30,
-              loop: false,
-              startDelay: 0,
-              showCursor: false,
-              onComplete: function () {
-                new Typed(".language-text", {
-                  strings: [
-                    "I code in Swift, HTML, CSS, Javascript , and Python",
-                  ],
-                  typeSpeed: 30,
-                  loop: false,
-                  startDelay: 0,
-                  showCursor: false,
-                  onComplete: function () {
-                    new Typed(".hobby-text", {
-                      strings: [
-                        "I <span class = 'color-primary'>love</span> to talk about <span class = 'color-primary'>iOS</span>, <span class = 'color-primary'>technology</span> and <span class = 'color-primary'>life</span>.",
-                      ],
-                      typeSpeed: 30,
-                      loop: false,
-                      startDelay: 0,
-                      showCursor: false,
-                      onComplete: function () {
-                        new Typed(".game-text", {
-                          strings: [
-                            "I also enjoy occasional gaming, my favorites being DOTA 2 and Fortnite",
-                          ],
-                          typeSpeed: 30,
-                          loop: false,
-                          startDelay: 0,
-                          showCursor: false,
-                          onComplete: function () {
-                            new Typed(".contribution-text", {
-                              strings: [
-                                "I've recently created an <a href='https://www.instagram.com/shubham_iosdev/' target='_blank'><span class = 'color-palatte-4'> Instagram</span></a> handle to share my knowledge, connect with awesome people, and help other developers with iOS dev.",
-                              ],
-                              typeSpeed: 30,
-                              loop: false,
-                              startDelay: 0,
-                              showCursor: false,
-                              onComplete: function () {
-                                new Typed(".motto", {
-                                  strings: [
-                                    "My long term goal is to develop something that makes a difference in people's life.",
-                                  ],
-                                  typeSpeed: 30,
-                                  loop: false,
-                                  startDelay: 0,
-                                  showCursor: false,
-                                  onComplete: function () {
-                                    $(".grid-data").addClass("flip-in-x");
-                                    $(".services-header ").addClass(
-                                      "flip-in-x"
-                                    );
-                                  },
-                                });
-                              },
-                            });
-                          },
-                        });
-                      },
-                    });
-                  },
-                });
-              },
-            });
-          },
+    // Background-images
+    $('[data-background]').each(function () {
+        $(this).css({
+            'background-image': 'url(' + $(this).data('background') + ')'
         });
-      },
     });
-    aboutSectionEntered = true;
-  }
-}
+
+    // background color
+    $('[data-color]').each(function () {
+        $(this).css({
+            'background-color': $(this).data('color')
+        });
+    });
+
+    // progress bar
+    $('[data-progress]').each(function () {
+        $(this).css({
+            'bottom': $(this).data('progress')
+        });
+    });
+
+
+    /* ########################################### hero parallax ############################################## */
+    window.onload = function () {
+
+        var parallaxBox = document.getElementById('parallax');
+        var
+            /* c1left = document.getElementById('l1').offsetLeft,
+                       c1top = document.getElementById('l1').offsetTop, */
+            c2left = document.getElementById('l2').offsetLeft,
+            c2top = document.getElementById('l2').offsetTop,
+            c3left = document.getElementById('l3').offsetLeft,
+            c3top = document.getElementById('l3').offsetTop,
+            c4left = document.getElementById('l4').offsetLeft,
+            c4top = document.getElementById('l4').offsetTop,
+            c5left = document.getElementById('l5').offsetLeft,
+            c5top = document.getElementById('l5').offsetTop,
+            c6left = document.getElementById('l6').offsetLeft,
+            c6top = document.getElementById('l6').offsetTop,
+            c7left = document.getElementById('l7').offsetLeft,
+            c7top = document.getElementById('l7').offsetTop,
+            c8left = document.getElementById('l8').offsetLeft,
+            c8top = document.getElementById('l8').offsetTop,
+            c9left = document.getElementById('l9').offsetLeft,
+            c9top = document.getElementById('l9').offsetTop;
+
+        parallaxBox.onmousemove = function (event) {
+            event = event || window.event;
+            var x = event.clientX - parallaxBox.offsetLeft,
+                y = event.clientY - parallaxBox.offsetTop;
+
+            /*  mouseParallax('l1', c1left, c1top, x, y, 5); */
+            mouseParallax('l2', c2left, c2top, x, y, 25);
+            mouseParallax('l3', c3left, c3top, x, y, 20);
+            mouseParallax('l4', c4left, c4top, x, y, 35);
+            mouseParallax('l5', c5left, c5top, x, y, 30);
+            mouseParallax('l6', c6left, c6top, x, y, 45);
+            mouseParallax('l7', c7left, c7top, x, y, 30);
+            mouseParallax('l8', c8left, c8top, x, y, 25);
+            mouseParallax('l9', c9left, c9top, x, y, 40);
+        };
+
+    };
+
+    function mouseParallax(id, left, top, mouseX, mouseY, speed) {
+        var obj = document.getElementById(id);
+        var parentObj = obj.parentNode,
+            containerWidth = parseInt(parentObj.offsetWidth),
+            containerHeight = parseInt(parentObj.offsetHeight);
+        obj.style.left = left - (((mouseX - (parseInt(obj.offsetWidth) / 2 + left)) / containerWidth) * speed) + 'px';
+        obj.style.top = top - (((mouseY - (parseInt(obj.offsetHeight) / 2 + top)) / containerHeight) * speed) + 'px';
+    }
+    /* ########################################### /hero parallax ############################################## */
+
+    // testimonial-slider
+    $('.testimonial-slider').slick({
+        dots: true,
+        infinite: true,
+        speed: 300,
+        slidesToShow: 1,
+        arrows: false,
+        adaptiveHeight: true
+    });
+
+
+    // clients logo slider
+    $('.client-logo-slider').slick({
+        infinite: true,
+        slidesToShow: 5,
+        slidesToScroll: 1,
+        autoplay: true,
+        dots: false,
+        arrows: false,
+        responsive: [{
+                breakpoint: 1024,
+                settings: {
+                    slidesToShow: 3,
+                    slidesToScroll: 1
+                }
+            },
+            {
+                breakpoint: 600,
+                settings: {
+                    slidesToShow: 3,
+                    slidesToScroll: 1
+                }
+            },
+            {
+                breakpoint: 480,
+                settings: {
+                    slidesToShow: 2,
+                    slidesToScroll: 1
+                }
+            },
+            {
+                breakpoint: 400,
+                settings: {
+                    slidesToShow: 1,
+                    slidesToScroll: 1
+                }
+            }
+        ]
+    });
+
+    // Shuffle js filter and masonry
+    var Shuffle = window.Shuffle;
+    var jQuery = window.jQuery;
+
+    var myShuffle = new Shuffle(document.querySelector('.shuffle-wrapper'), {
+        itemSelector: '.shuffle-item',
+        buffer: 1
+    });
+
+    jQuery('input[name="shuffle-filter"]').on('change', function (evt) {
+        var input = evt.currentTarget;
+        if (input.checked) {
+            myShuffle.filter(input.value);
+        }
+    });
+
+
+
+})(jQuery);
